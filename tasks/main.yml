@@ -1,0 +1,97 @@
+---
+# tasks file for waal70.dev_tools
+- name: "Set fact for user to run docker exec under"
+  ansible.builtin.set_fact:
+    docker_exec_user: "{{ ansible_facts['env'].SUDO_USER | default(ansible_facts['env'].USER, true) | default(ansible_facts['user_id'], true) }}"
+
+- name: Include vaulted password file
+  ansible.builtin.include_vars:
+    file: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ private_repo }}/{{ ansible_vault }}/{{ ansible_role_name }}-vars.yml"
+      skip: true
+
+- name: Ensure the persistent data paths are created and chowned correctly
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: '1001'
+    group: '1001'
+  with_items:
+    - "{{ nginx_vol_templates }}"
+    - "{{ nginx_host_root }}"
+    - "{{ nginx_vol_cache }}"
+    - "{{ nginx_vol_pid }}"
+    - "{{ nginx_vol_conf_d }}"
+
+- name: "Template the nginx.conf file to the appropriate directory"
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_vol_conf_d }}/default.conf"
+    owner: "{{ interactive_user }}"
+    group: "{{ interactive_user }}"
+    mode: '0644'
+    force: true
+
+- name: "Template the nginx.yml file to the role's files/ directory"
+  ansible.builtin.template:
+    src: nginx.yml.j2
+    dest: "{{ role_path }}/files/nginx.yml"
+    owner: "{{ interactive_user }}"
+    group: "{{ interactive_user }}"
+    mode: '0644'
+    force: true
+  delegate_to: localhost
+
+- name: "Template the update script out to the appropriate directory"
+  ansible.builtin.template:
+    src: update-debmirror.sh.j2
+    dest: "/media/update-debmirror.sh"
+    owner: "{{ interactive_user }}"
+    group: "{{ interactive_user }}"
+    mode: '0755'
+    force: true
+
+- name: "Include role to deploy using Portainer"
+  ansible.builtin.include_role:
+    name: waal70.portainer
+  vars:
+    stack_list:
+      - name: debmirror
+        file: nginx.yml # file is in files/ of this role
+
+- name: "Ensure debmirror package is present on the system"
+  ansible.builtin.apt:
+    name:
+      - debmirror
+      - gpg
+    state: present
+    update_cache: true
+    cache_valid_time: 81400
+    autoremove: true
+    autoclean: true
+
+# - name: "Run the debmirror command asynchronously"
+#   ansible.builtin.command:
+#     argv:
+#       - "{{ debmirror_exe }}"
+#       - "{{ debmirror_options }}"
+#       - --method=http
+#       - --di-dist=trixie
+#       - --di-arch=amd64
+#       - --precleanup
+#       - --nosource
+#       - --ignore-release-gpg
+#       - -h
+#       - "{{ debmirror_host }}"
+#       - --dist=trixie,trixie-updates
+#       - --section={{ debmirror_section }}
+#       - --arch={{ debmirror_arch }}
+#       - "{{ nginx_host_root }}"
+#   changed_when: false
+#   become: true
+#   become_user: "{{ interactive_user }}"
+#   async: 30
+#   poll: 0

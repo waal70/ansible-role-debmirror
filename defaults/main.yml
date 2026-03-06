@@ -1,0 +1,13 @@
+---
+nginx_vol_templates: "/appdata/nginx/templates"
+nginx_vol_conf_d: "/appdata/nginx/conf.d"
+nginx_vol_cache: "/appdata/nginx/nginx-cache"
+nginx_vol_pid: "/appdata/nginx/nginx-pid"
+
+nginx_host_root: "/media/debmirror"
+
+debmirror_exe: "/usr/bin/debmirror"
+debmirror_host: "debian.snt.utwente.nl"
+debmirror_section: "main,contrib,non-free,non-free-firmware"
+debmirror_arch: "amd64,arm64"
+debmirror_options: "--method=http --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg"

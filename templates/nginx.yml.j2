@@ -1,0 +1,17 @@
+services:
+  web:
+    image: nginx
+    container_name: debmirror
+    user: "1001:1001"
+    volumes:
+    - {{ nginx_vol_templates }}:/etc/nginx/templates
+    - {{ nginx_vol_conf_d }}:/etc/nginx/conf.d #:ro
+    - {{ nginx_vol_cache }}:/var/cache/nginx
+    - {{ nginx_vol_pid }}:/var/run
+    - {{ nginx_host_root }}:/usr/share/nginx/html
+    ports:
+    - "8888:80"
+    environment:
+    - NGINX_HOST=debian.andrecatherine.net
+    - NGINX_PORT=80
+    restart: unless-stopped

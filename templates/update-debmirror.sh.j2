@@ -1,0 +1,4 @@
+#!/bin/bash
+# This will update (ad-hoc) the debian mirror
+
+/usr/bin/debmirror --method=https -h debian.snt.utwente.nl --dist=trixie,trixie-updates --section=main,contrib,non-free,non-free-firmware --arch=amd64,armhf --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg {{ nginx_host_root }}
