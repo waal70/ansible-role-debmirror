@@ -76,7 +76,7 @@
 - name: "Create a cron-job to update the mirror at reboot/startup"
   ansible.builtin.cron:
     name: Mirror update at startup
-    job: "/media/update-debmirror.sh"
+    job: "/media/update-debmirror.sh > /home/{{ interactive_user }}/crontab.log"
     special_time: reboot
     state: present
     user: "{{ interactive_user }}"
@@ -84,7 +84,7 @@
 - name: "Create a cron-job to run the update every 6 hours"
   ansible.builtin.cron:
     name: Mirror update regularly
-    job: "/media/update-debmirror.sh"
+    job: "/media/update-debmirror.sh >> /home/{{ interactive_user }}/crontab.log"
     user: "{{ interactive_user }}"
     minute: "30"
     hour: "*/6"
