@@ -73,25 +73,19 @@
     autoremove: true
     autoclean: true
 
-# - name: "Run the debmirror command asynchronously"
-#   ansible.builtin.command:
-#     argv:
-#       - "{{ debmirror_exe }}"
-#       - "{{ debmirror_options }}"
-#       - --method=http
-#       - --di-dist=trixie
-#       - --di-arch=amd64
-#       - --precleanup
-#       - --nosource
-#       - --ignore-release-gpg
-#       - -h
-#       - "{{ debmirror_host }}"
-#       - --dist=trixie,trixie-updates
-#       - --section={{ debmirror_section }}
-#       - --arch={{ debmirror_arch }}
-#       - "{{ nginx_host_root }}"
-#   changed_when: false
-#   become: true
-#   become_user: "{{ interactive_user }}"
-#   async: 30
-#   poll: 0
+- name: "Create a cron-job to update the mirror at reboot/startup"
+  ansible.builtin.cron:
+    name: Mirror update at startup
+    job: "/media/update-debmirror.sh"
+    special_time: reboot
+    state: present
+    user: "{{ interactive_user }}"
+
+- name: "Create a cron-job to run the update every 6 hours"
+  ansible.builtin.cron:
+    name: Mirror update regularly
+    job: "/media/update-debmirror.sh"
+    user: "{{ interactive_user }}"
+    minute: "30"
+    hour: "*/6"
+    state: present

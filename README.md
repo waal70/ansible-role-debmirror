@@ -2,10 +2,15 @@ waal70.debmirror
 =========
 
 Docker Compose project to create a Debian apt mirror and host it over nginx
+It provides an update script which will be cron scheduled for after reboot
+As Debian updates mirrors at 3:00, 9:00, 15:00 and 21:00 UTC
+And then once every 6 hours.
 
 Additional tasks
 ----------------
 
+Creates a debmirror-update.sh script
+Schedules cron for the interactive user
 
 Getting it up and running
 -------------------------
@@ -19,6 +24,7 @@ Dependencies
 ------------
 
 waal70.portainer
+In order to install the nginx that will serve the mirror files
 
 License
 -------
