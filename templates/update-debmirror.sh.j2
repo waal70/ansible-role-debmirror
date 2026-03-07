@@ -5,4 +5,4 @@
 # arch armhf is for Raspberry Pi 5
 # arch arm64 is for Raspberry Pi 4
 
-{{ debmirror_exe }} --method=https -h {{ debmirror_host }} --dist=trixie,trixie-updates --section=main,contrib,non-free,non-free-firmware --arch=amd64,armhf,arm64 --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg {{ nginx_host_root }}
+{{ debmirror_exe }} --method=https -h {{ debmirror_host }} --dist=trixie,trixie-updates --section=main,contrib,non-free,non-free-firmware,main/debian-installer,contrib/debian-installer,non-free/debian-installer,non-free-firmware/debian-installer --arch=amd64,armhf,arm64 --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg {{ nginx_host_root }}
