@@ -54,6 +54,14 @@
     mode: '0755'
     force: true
 
+- name: "Copy over the preseed.cfg to have one available in the mirror"
+  ansible.builtin.copy:
+    src: "{{ private_repo }}/ansible-vault/preseed.cfg"
+    dest: "/media/preseed.cfg"
+    owner: "{{ interactive_user }}"
+    group: "{{ interactive_user }}"
+    mode: '0644'
+
 - name: "Include role to deploy using Portainer"
   ansible.builtin.include_role:
     name: waal70.portainer

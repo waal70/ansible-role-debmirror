@@ -13,3 +13,8 @@ echo "Starting debmirror..."
 {{ debmirror_exe }} --method=https -h {{ debmirror_host }} --dist=trixie,trixie-updates --section=main,contrib,non-free,non-free-firmware,main/debian-installer,contrib/debian-installer,non-free/debian-installer,non-free-firmware/debian-installer --arch=amd64,armhf,arm64 --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg {{ nginx_host_root }} > /dev/null
 
 echo "Finished mirror update with exitcode $? at UTC: $(date --utc +%Y%m%d_%H%M%SZ)."
+# Now copy over the preseed.cfg
+
+echo "Ensuring preseed.cfg is also present..."
+cp /media/preseed.cfg {{ nginx_host_root }}/preseed.cfg
+echo "Done!"
