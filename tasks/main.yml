@@ -35,10 +35,10 @@
     mode: '0644'
     force: true
 
-- name: "Template the nginx.yml file to the role's files/ directory"
+- name: "Template the service compose file to the role's files/ directory for {{ service_name }}"
   ansible.builtin.template:
-    src: nginx.yml.j2
-    dest: "{{ role_path }}/files/nginx.yml"
+    src: "{{ service_name }}.yml.j2"
+    dest: "{{ role_path }}/files/{{ service_name }}.yml"
     owner: "{{ interactive_user }}"
     group: "{{ interactive_user }}"
     mode: '0644'
@@ -48,7 +48,7 @@
 - name: "Template the update script out to the appropriate directory"
   ansible.builtin.template:
     src: update-debmirror.sh.j2
-    dest: "/media/update-debmirror.sh"
+    dest: "{{ service_media_root }}/update-debmirror.sh"
     owner: "{{ interactive_user }}"
     group: "{{ interactive_user }}"
     mode: '0755'
@@ -57,7 +57,7 @@
 - name: "Copy over the preseed.cfg to have one available in the mirror"
   ansible.builtin.copy:
     src: "{{ private_repo }}/ansible-vault/preseed.cfg"
-    dest: "/media/preseed.cfg"
+    dest: "{{ service_media_root }}/preseed.cfg"
     owner: "{{ interactive_user }}"
     group: "{{ interactive_user }}"
     mode: '0644'
@@ -67,8 +67,8 @@
     name: waal70.portainer
   vars:
     stack_list:
-      - name: debmirror
-        file: nginx.yml # file is in files/ of this role
+      - name: "debmirror"
+        file: "debmirror.yml" # file is in files/ of this role
 
 - name: "Ensure debmirror package is present on the system"
   ansible.builtin.apt:
@@ -84,7 +84,7 @@
 - name: "Create a cron-job to update the mirror at reboot/startup"
   ansible.builtin.cron:
     name: Mirror update at startup
-    job: "/media/update-debmirror.sh > /home/{{ interactive_user }}/crontab.log"
+    job: "{{ service_media_root }}/update-debmirror.sh > /home/{{ interactive_user }}/crontab.log"
     special_time: reboot
     state: present
     user: "{{ interactive_user }}"
@@ -92,7 +92,7 @@
 - name: "Create a cron-job to run the update every 6 hours"
   ansible.builtin.cron:
     name: Mirror update regularly
-    job: "/media/update-debmirror.sh >> /home/{{ interactive_user }}/crontab.log"
+    job: "{{ service_media_root }}/update-debmirror.sh >> /home/{{ interactive_user }}/crontab.log"
     user: "{{ interactive_user }}"
     minute: "30"
     hour: "*/6"
