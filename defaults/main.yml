@@ -11,3 +11,30 @@ nginx_host_root: "/media/debmirror"
 debmirror_exe: "/usr/bin/debmirror"
 # Name of your favourite debian mirror. Pick one that is geographically close
 debmirror_host: "debian.snt.utwente.nl"
+# Convenience/documentation variables for the architectures
+# The name of the variable will tell you WHY this arch is included
+debmirror_arch_pi4: "arm64"
+debmirror_arch_pi5: "armhf"
+debmirror_arch_intel: "amd64"
+# The architectures to download
+debmirror_archs: [
+  "{{ debmirror_arch_intel }}",
+  "{{ debmirror_arch_pi4 }}",
+  "{{ debmirror_arch_pi5 }}"
+]
+# Defaults to current distribution release and -updates (e.g.: trixie and trixie-updates)
+debmirror_dists: [
+  "{{ ansible_facts['distribution_release'] }}",
+  "{{ ansible_facts['distribution_release'] }}-updates"
+]
+# If you host a debian-installer, all sections need a /debian-installer as well
+debmirror_sections: [
+  "main",
+  "contrib",
+  "non-free",
+  "non-free-firmware",
+  "main/debian-installer",
+  "contrib/debian-installer",
+  "non-free/debian-installer",
+  "non-free-firmware/debian-installer"
+]

@@ -1,16 +1,18 @@
 #!/bin/bash
 # This will update (ad-hoc) the debian mirror
 
-# arch amd64 is for Intel-based machines
-# arch armhf is for Raspberry Pi 5
-# arch arm64 is for Raspberry Pi 4
+# Common variables.
+MIRROR={{ debmirror_host }}
+ARCH={{ debmirror_archs | join(',') }}
+DIST={{ debmirror_dists | join(',') }}
+SECTION={{ debmirror_sections | join(',') }}
 
 # Because this is possibly called from cron at reboot, sleep for 30 seconds to allow DNS to come up
 echo "Mirror update started at UTC: $(date --utc +%Y%m%d_%H%M%SZ)"
 echo "Sleeping 30s to allow DNS to recover..."
 sleep 30
 echo "Starting debmirror..."
-{{ debmirror_exe }} --method=https -h {{ debmirror_host }} --dist=trixie,trixie-updates --section=main,contrib,non-free,non-free-firmware,main/debian-installer,contrib/debian-installer,non-free/debian-installer,non-free-firmware/debian-installer --arch=amd64,armhf,arm64 --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg {{ nginx_host_root }} > /dev/null
+{{ debmirror_exe }} --method=https -h $MIRROR --dist=$DIST --section=$SECTION --arch=$ARCH --di-dist=trixie --di-arch=amd64 --precleanup --nosource --ignore-release-gpg {{ nginx_host_root }} > /dev/null
 
 echo "Finished mirror update with exitcode $? at UTC: $(date --utc +%Y%m%d_%H%M%SZ)."
 # Now copy over the preseed.cfg
